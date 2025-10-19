@@ -6,18 +6,13 @@ import { resolve } from "path";
 export default defineConfig({
   plugins: [react()],
   build: {
-    lib: {
-      entry: resolve(__dirname, "src/main.ts"),
-      name: "SarvamWidget",
-      fileName: "widget",
-      formats: ["iife"],
-    },
     rollupOptions: {
+      input: {
+        main: resolve(__dirname, "index.html"),
+      },
       output: {
         // Ensure all code is bundled into a single file
         inlineDynamicImports: true,
-        // Use named exports to avoid warning
-        exports: "named",
         // Use a simple filename without hash
         entryFileNames: "widget.js",
         chunkFileNames: "widget.js",

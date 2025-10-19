@@ -2,54 +2,48 @@
 
 An embeddable chat + voice agent widget built with React and TypeScript, powered by **Google Gemini AI**. Designed to be easily integrated into any website with a single script tag.
 
-## 🚀 Quick Start
+## Features
 
-### 1. Environment Setup
+- 🤖 **Google Gemini AI**: Powered by advanced AI capabilities with natural conversations
+- 🧠 **Context Memory**: Remembers conversation history across browser sessions
+- 🌐 **Multi-Language Support**: Built-in support for English, Hindi, Spanish, and easily extensible
+- 🚀 **Easy Integration**: Single script tag integration
+- 🎨 **Customizable**: Configurable themes, positioning, and branding
+- 🛡️ **CSS Isolation**: Uses Shadow DOM to prevent style conflicts
+- 📱 **Responsive**: Mobile-friendly design with modern UI
+- 🎤 **Voice Support**: Speech-to-text with multi-language voice recognition
+- ⚡ **Smart UI**: Context indicators, clear memory, smooth animations
+- 🔧 **TypeScript**: Full type safety and IntelliSense support
+- 💾 **Persistent Storage**: Chat history saved locally with localStorage
 
-Create `.env.local` and add your Gemini API key:
+## Quick Start
+
+### 1. Install Dependencies
 
 ```bash
-# Get API key from: https://makersuite.google.com/app/apikey
-echo "GEMINI_API_KEY=your_actual_gemini_api_key_here" > .env.local
+npm install
 ```
 
 ### 2. Development
 
 ```bash
-npm install
-npm run build
-npm run preview  # For UI testing only
-# Note: Real AI responses only work when deployed to Vercel
+npm run dev
 ```
 
-### 3. Deployment
+### 3. Build
 
 ```bash
-# Set environment variable in Vercel dashboard:
-# GEMINI_API_KEY = your_actual_api_key
-
-vercel --prod
+npm run build
 ```
 
-## Features
-
-- 🤖 **Google Gemini AI** - Advanced conversational AI
-- 🔒 **Secure Architecture** - Server-side API key handling
-- 🧠 **Context Memory** - Persistent chat history
-- 🌐 **Multi-Language Support** - English, Hindi, Spanish + extensible
-- 🚀 **Easy Integration** - Single script tag
-- 🎨 **Customizable** - Themes, positioning, branding
-- 🛡️ **CSS Isolation** - Shadow DOM prevents conflicts
-- 📱 **Responsive Design** - Mobile-friendly UI
-- 🎤 **Voice Support** - Multi-language speech recognition
-- 💾 **Persistent Storage** - Chat history saved locally
+This creates a `dist/widget.js` file that can be embedded in any website.
 
 ## Integration
 
 ### Basic Usage
 
 ```html
-<script src="https://your-domain.vercel.app/dist/widget.js"></script>
+<script src="path/to/widget.js"></script>
 ```
 
 ### With Configuration
@@ -64,11 +58,12 @@ vercel --prod
       textColor: "#1f2937",
     },
     agent: {
-      name: "AI Assistant",
+      name: "Gemini Assistant",
       avatar: "https://example.com/avatar.png",
     },
     enableVoice: true,
-    context: "You are a helpful AI assistant.",
+    context:
+      "You are a helpful AI assistant powered by Google Gemini. You have access to a wide range of knowledge and can help with various tasks including coding, writing, analysis, and general questions.",
     supportedLanguages: [
       {
         code: "en",
@@ -87,41 +82,91 @@ vercel --prod
     defaultLanguage: "en",
   };
 </script>
-<script src="https://your-domain.vercel.app/dist/widget.js"></script>
+<script src="path/to/widget.js"></script>
 ```
 
 ## Configuration Options
 
-| Option                  | Type    | Default               | Description                                           |
-| ----------------------- | ------- | --------------------- | ----------------------------------------------------- |
-| `position`              | string  | `'bottom-right'`      | Widget position (`bottom-right`, `bottom-left`, etc.) |
-| `theme.primaryColor`    | string  | `'#4F46E5'`           | Primary color for buttons and accents                 |
-| `theme.backgroundColor` | string  | `'#ffffff'`           | Background color of chat window                       |
-| `theme.textColor`       | string  | `'#1f2937'`           | Text color                                            |
-| `agent.name`            | string  | `'HelperBot'`         | Display name of the agent                             |
-| `agent.avatar`          | string  | Generated placeholder | URL to agent's avatar image                           |
-| `enableVoice`           | boolean | `true`                | Show voice recording button                           |
-| `context`               | string  | `'You are helpful'`   | Context/instructions for the agent                    |
-| `supportedLanguages`    | array   | `[en, hi, es]`        | Language configuration array                          |
-| `defaultLanguage`       | string  | `'en'`                | Default language code                                 |
+| Option                  | Type    | Default                         | Description                                                                     |
+| ----------------------- | ------- | ------------------------------- | ------------------------------------------------------------------------------- |
+| `position`              | string  | `'bottom-right'`                | Widget position: `'bottom-right'`, `'bottom-left'`, `'top-right'`, `'top-left'` |
+| `theme.primaryColor`    | string  | `'#4F46E5'`                     | Primary color for buttons and accents                                           |
+| `theme.backgroundColor` | string  | `'#ffffff'`                     | Background color of chat window                                                 |
+| `theme.textColor`       | string  | `'#1f2937'`                     | Text color                                                                      |
+| `agent.name`            | string  | `'HelperBot'`                   | Display name of the agent                                                       |
+| `agent.avatar`          | string  | Generated placeholder           | URL to agent's avatar image                                                     |
+| `enableVoice`           | boolean | `true`                          | Show voice recording button                                                     |
+| `context`               | string  | `'You are a helpful assistant'` | Context/instructions for the agent                                              |
+| `supportedLanguages`    | array   | `[en, hi, es]`                  | Array of language objects with `code`, `name`, `nativeName`, and `voiceCode`    |
+| `defaultLanguage`       | string  | `'en'`                          | Default language code (must match one of the supported languages)               |
 
 ## API
 
+The widget exposes a global `SarvamWidget` object with the following methods:
+
 ```javascript
-// Widget controls
-SarvamWidget.init(); // Initialize (auto-called)
-SarvamWidget.show(); // Show widget
-SarvamWidget.hide(); // Hide widget
-SarvamWidget.destroy(); // Remove widget
+// Initialize widget (auto-called)
+SarvamWidget.init();
+
+// Hide widget
+SarvamWidget.hide();
+
+// Show widget
+SarvamWidget.show();
+
+// Destroy widget
+SarvamWidget.destroy();
+
+// Get widget instance
+const instance = SarvamWidget.getInstance();
 ```
 
 ## Architecture
 
-- **Secure API**: Server-side Gemini integration via Vercel functions
-- **Shadow DOM**: Complete CSS isolation from host page
-- **React 18**: Modern React with TypeScript
-- **Vite**: Optimized build system
-- **Vercel**: Serverless deployment platform
+- **Google Gemini AI**: Advanced conversational AI with context understanding
+- **Context Memory**: Persistent chat history using localStorage and Gemini's chat sessions
+- **Shadow DOM**: Ensures complete CSS isolation from the host page
+- **React 18**: Modern React with concurrent features
+- **TypeScript**: Full type safety
+- **Vite**: Fast build system optimized for libraries
+- **CSS-in-JS**: Scoped styles using CSS custom properties
+
+## Development
+
+### Project Structure
+
+```
+src/
+├── api/
+│   └── gemini.ts           # Google Gemini AI integration
+├── components/
+│   ├── ChatButton.tsx      # Floating chat button
+│   ├── ChatWindow.tsx      # Main chat interface
+│   └── Widget.tsx          # Root component
+├── utils/
+│   ├── languages.ts        # Multi-language support utilities
+│   ├── storage.ts          # localStorage chat history management
+│   └── voiceRecording.ts   # Web Speech API integration
+├── config.ts               # Configuration handling
+├── types.ts                # TypeScript definitions
+├── styles.css              # Widget styles
+└── main.ts                 # Entry point & Shadow DOM setup
+```
+
+### Building for Production
+
+```bash
+npm run build
+```
+
+Creates:
+
+- `dist/widget.js` - Main embeddable bundle (IIFE format)
+- `dist/widget.css` - Extracted CSS (if any)
+
+### Testing Integration
+
+Open `index.html` in a browser after building to see the widget in action.
 
 ## Browser Support
 
