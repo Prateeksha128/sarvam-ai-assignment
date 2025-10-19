@@ -1,6 +1,6 @@
 import { GoogleGenerativeAI } from "@google/generative-ai";
 
-const genAI = new GoogleGenerativeAI("AIzaSyCqjAPCzwnMZezZlg3mWQTm2XbOa5_5J20");
+const genAI = new GoogleGenerativeAI("AIzaSyChQXOJu-661I2cJr4dgbypfSR5zlxgujs");
 const model = genAI.getGenerativeModel({ model: "gemini-2.0-flash-exp" });
 
 let chatSession: any = null;
