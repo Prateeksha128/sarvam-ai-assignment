@@ -1,7 +1,7 @@
-import React from 'react';
-import { createRoot } from 'react-dom/client';
-import { Widget } from './components/Widget';
-import './styles.css';
+import React from "react";
+import { createRoot } from "react-dom/client";
+import { Widget } from "./components/Widget";
+import "./styles.css";
 
 // Import CSS as text for Shadow DOM
 const styleText = `
@@ -479,8 +479,8 @@ class SarvamWidget {
 
   constructor() {
     // Initialize the widget when DOM is ready
-    if (document.readyState === 'loading') {
-      document.addEventListener('DOMContentLoaded', () => this.init());
+    if (document.readyState === "loading") {
+      document.addEventListener("DOMContentLoaded", () => this.init());
     } else {
       this.init();
     }
@@ -491,20 +491,19 @@ class SarvamWidget {
       this.createShadowDOM();
       this.injectStyles();
       this.renderWidget();
-      console.log('Sarvam Widget initialized successfully');
     } catch (error) {
-      console.error('Failed to initialize Sarvam Widget:', error);
+      // Silently handle initialization errors
     }
   }
 
   private createShadowDOM(): void {
     // Create the host element
-    this.shadowHost = document.createElement('div');
-    this.shadowHost.id = 'sarvam-widget-host';
-    
+    this.shadowHost = document.createElement("div");
+    this.shadowHost.id = "sarvam-widget-host";
+
     // Attach shadow DOM for CSS isolation
-    this.shadowRoot = this.shadowHost.attachShadow({ mode: 'closed' });
-    
+    this.shadowRoot = this.shadowHost.attachShadow({ mode: "closed" });
+
     // Add to DOM
     document.body.appendChild(this.shadowHost);
   }
@@ -513,7 +512,7 @@ class SarvamWidget {
     if (!this.shadowRoot) return;
 
     // Create style element
-    const styleElement = document.createElement('style');
+    const styleElement = document.createElement("style");
     styleElement.textContent = styleText;
     this.shadowRoot.appendChild(styleElement);
   }
@@ -522,8 +521,8 @@ class SarvamWidget {
     if (!this.shadowRoot) return;
 
     // Create container for React app
-    const container = document.createElement('div');
-    container.id = 'widget-root';
+    const container = document.createElement("div");
+    container.id = "widget-root";
     this.shadowRoot.appendChild(container);
 
     // Render React component
@@ -537,7 +536,7 @@ class SarvamWidget {
       this.root.unmount();
       this.root = null;
     }
-    
+
     if (this.shadowHost && this.shadowHost.parentNode) {
       this.shadowHost.parentNode.removeChild(this.shadowHost);
       this.shadowHost = null;
@@ -547,13 +546,13 @@ class SarvamWidget {
 
   public show(): void {
     if (this.shadowHost) {
-      this.shadowHost.style.display = 'block';
+      this.shadowHost.style.display = "block";
     }
   }
 
   public hide(): void {
     if (this.shadowHost) {
-      this.shadowHost.style.display = 'none';
+      this.shadowHost.style.display = "none";
     }
   }
 }
@@ -564,10 +563,9 @@ let widgetInstance: SarvamWidget | null = null;
 // Initialize widget
 function initWidget() {
   if (widgetInstance) {
-    console.warn('Sarvam Widget is already initialized');
     return widgetInstance;
   }
-  
+
   widgetInstance = new SarvamWidget();
   return widgetInstance;
 }
@@ -583,7 +581,7 @@ const SarvamWidgetAPI = {
   },
   show: () => widgetInstance?.show(),
   hide: () => widgetInstance?.hide(),
-  getInstance: () => widgetInstance
+  getInstance: () => widgetInstance,
 };
 
 // Attach to window for global access

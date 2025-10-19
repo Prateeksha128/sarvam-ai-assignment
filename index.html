@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Sarvam Widget Demo - Development</title>
-    <link rel="icon" type="image/svg+xml" href="/public/favicon.svg">
+    <link rel="icon" type="image/svg+xml" href="./favicon.svg">
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -71,7 +71,7 @@
   theme: { primaryColor: '#4F46E5' },
   agent: { 
     name: 'Gemini Assistant', 
-    avatar: '/public/avatar.svg'
+    avatar: './avatar.svg'
   },
   enableVoice: true,
   context: "You are a helpful AI assistant powered by Google Gemini...",
@@ -94,14 +94,12 @@
             },
             agent: {
                 name: 'Gemini Assistant',
-                avatar: '/public/avatar.svg'
+                avatar: './avatar.svg'
             },
             enableVoice: true,
             context: "You are a helpful AI assistant powered by Google Gemini. You have access to a wide range of knowledge and can help with various tasks including coding, writing, analysis, and general questions. Be concise but thorough in your responses."
         };
 
-        // Enable additional debug logging
-        console.log("🔧 Widget config loaded:", window.AgentWidgetConfig);
     </script>
 
     <!-- Widget Script -->

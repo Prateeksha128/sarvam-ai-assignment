@@ -8261,7 +8261,6 @@ const genAI = new GoogleGenerativeAI("AIzaSyCqjAPCzwnMZezZlg3mWQTm2XbOa5_5J20");
 const model = genAI.getGenerativeModel({ model: "gemini-2.0-flash-exp" });
 let chatSession = null;
 function initGeminiChat(context) {
-  console.log("🤖 Initializing Gemini chat with context:", context);
   chatSession = model.startChat({
     history: [
       {
@@ -8274,27 +8273,16 @@ function initGeminiChat(context) {
       temperature: 0.7
     }
   });
-  console.log("✅ Gemini chat session initialized");
 }
 async function sendMessageToGemini(message) {
-  console.log("📤 Sending message to Gemini:", message);
   if (!chatSession) {
-    console.log("⚠️ No chat session found, initializing...");
     initGeminiChat("You are a helpful assistant.");
   }
   try {
-    console.log("🔄 Calling Gemini API...");
     const result = await chatSession.sendMessage(message);
     const response = result.response.text();
-    console.log("📥 Gemini response received:", response);
     return response || "(No response)";
   } catch (error) {
-    console.error("❌ Gemini API error:", error);
-    console.error("Error details:", {
-      message: error == null ? void 0 : error.message,
-      stack: error == null ? void 0 : error.stack,
-      name: error == null ? void 0 : error.name
-    });
     return `Sorry, I encountered an error: ${(error == null ? void 0 : error.message) || "Could not reach Gemini API"}`;
   }
 }
@@ -8313,7 +8301,6 @@ function saveChatHistory(messages, context) {
     };
     localStorage.setItem(STORAGE_KEY, JSON.stringify(history));
   } catch (error) {
-    console.warn("Failed to save chat history to localStorage:", error);
   }
 }
 function loadChatHistory() {
@@ -8327,7 +8314,6 @@ function loadChatHistory() {
     }));
     return history;
   } catch (error) {
-    console.warn("Failed to load chat history from localStorage:", error);
     return null;
   }
 }
@@ -8335,7 +8321,6 @@ function clearChatHistory() {
   try {
     localStorage.removeItem(STORAGE_KEY);
   } catch (error) {
-    console.warn("Failed to clear chat history from localStorage:", error);
   }
 }
 class VoiceRecorder {
@@ -8355,7 +8340,6 @@ class VoiceRecorder {
   initializeSpeechRecognition() {
     const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
     if (!SpeechRecognition) {
-      console.warn("🎤 Speech Recognition not supported in this browser");
       this.isSupported = false;
       return;
     }
@@ -8366,16 +8350,13 @@ class VoiceRecorder {
     this.recognition.lang = "en-US";
     this.recognition.maxAlternatives = 1;
     this.recognition.onstart = () => {
-      console.log("🎤 Voice recording started");
       this.onStart();
     };
     this.recognition.onresult = (event) => {
       const transcript = event.results[0][0].transcript;
-      console.log("🎤 Voice transcript:", transcript);
       this.onResult(transcript);
     };
     this.recognition.onerror = (event) => {
-      console.error("🎤 Voice recognition error:", event.error);
       let errorMessage = "Voice recognition failed";
       switch (event.error) {
         case "not-allowed":
@@ -8396,7 +8377,6 @@ class VoiceRecorder {
       this.onError(errorMessage);
     };
     this.recognition.onend = () => {
-      console.log("🎤 Voice recording ended");
       this.onEnd();
     };
   }
@@ -8415,7 +8395,6 @@ class VoiceRecorder {
     try {
       this.recognition.start();
     } catch (error) {
-      console.error("🎤 Failed to start voice recording:", error);
       onError("Failed to start voice recording");
     }
   }
@@ -8432,7 +8411,6 @@ class VoiceRecorder {
   setLanguage(languageCode) {
     if (this.recognition) {
       this.recognition.lang = languageCode;
-      console.log("🎤 Voice recognition language set to:", languageCode);
     }
   }
 }
@@ -8480,14 +8458,12 @@ function saveLanguagePreference(languageCode) {
   try {
     localStorage.setItem(LANGUAGE_STORAGE_KEY, languageCode);
   } catch (error) {
-    console.warn("Failed to save language preference:", error);
   }
 }
 function loadLanguagePreference() {
   try {
     return localStorage.getItem(LANGUAGE_STORAGE_KEY);
   } catch (error) {
-    console.warn("Failed to load language preference:", error);
     return null;
   }
 }
@@ -8601,7 +8577,6 @@ ${inputValue}`;
       setMessages(finalMessages);
       saveMessagesToStorage(finalMessages);
     } catch (error) {
-      console.error("Error getting response:", error);
       const errorMessage = {
         id: (Date.now() + 1).toString(),
         type: "agent",
@@ -8615,7 +8590,9 @@ ${inputValue}`;
     }
   };
   const handleClearMemory = () => {
-    if (window.confirm("Clear chat history and start fresh? This cannot be undone.")) {
+    if (window.confirm(
+      "Clear chat history and start fresh? This cannot be undone."
+    )) {
       clearChatHistory();
       resetChatSession();
       const welcomeMessage = {
@@ -8630,14 +8607,11 @@ ${inputValue}`;
     }
   };
   const handleLanguageChange = (languageCode) => {
-    var _a;
     setCurrentLanguage(languageCode);
     saveLanguagePreference(languageCode);
     const voiceCode = getVoiceCode(languageCode, supportedLanguages);
     const voiceRecorder2 = getVoiceRecorder();
     voiceRecorder2.setLanguage(voiceCode);
-    const langName = ((_a = supportedLanguages.find((l2) => l2.code === languageCode)) == null ? void 0 : _a.nativeName) || "English";
-    console.log(`🌐 Language changed to: ${langName}`);
   };
   const handleKeyPress = (e) => {
     if (e.key === "Enter" && !e.shiftKey) {
@@ -8647,7 +8621,6 @@ ${inputValue}`;
   };
   const sendVoiceMessage = async (transcribedText) => {
     if (!transcribedText.trim()) return;
-    console.log("🎤 Processing voice message:", transcribedText);
     const userMessage = {
       id: Date.now().toString(),
       type: "user",
@@ -8673,7 +8646,6 @@ ${transcribedText}`;
       setMessages(finalMessages);
       saveMessagesToStorage(finalMessages);
     } catch (error) {
-      console.error("Error processing voice message:", error);
       const errorMessage = {
         id: (Date.now() + 1).toString(),
         type: "agent",
@@ -8695,37 +8667,31 @@ ${transcribedText}`;
     }
     const voiceRecorder2 = getVoiceRecorder();
     if (isRecording) {
-      console.log("🎤 Stopping voice recording...");
       voiceRecorder2.stopRecording();
       setIsRecording(false);
       setVoiceError(null);
     } else {
-      console.log("🎤 Starting voice recording...");
       setVoiceError(null);
       voiceRecorder2.startRecording(
         // onResult: speech was successfully transcribed
         (transcribedText) => {
-          console.log("🎤 Voice transcribed:", transcribedText);
           setIsRecording(false);
           setVoiceError(null);
           sendVoiceMessage(transcribedText);
         },
         // onError: something went wrong
         (error) => {
-          console.error("🎤 Voice error:", error);
           setIsRecording(false);
           setVoiceError(error);
         },
-        // onStart: recording started successfully  
+        // onStart: recording started successfully
         () => {
           setIsRecording(true);
           setVoiceError(null);
-          console.log("🎤 Voice recording active");
         },
         // onEnd: recording ended
         () => {
           setIsRecording(false);
-          console.log("🎤 Voice recording stopped");
         }
       );
     }
@@ -8734,122 +8700,176 @@ ${transcribedText}`;
     return date.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
   };
   if (!isOpen) return null;
-  return /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "chat-window opening", style: { "--primary-color": primaryColor }, children: [
-    /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "chat-header", children: [
-      /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "chat-header-info", children: [
-        /* @__PURE__ */ jsxRuntimeExports.jsx("img", { src: agentAvatar, alt: agentName, className: "chat-avatar" }),
-        /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "chat-agent-details", children: [
-          /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "chat-agent-name", children: agentName }),
-          hasContextMemory && /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "context-indicator", children: [
-            /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "context-dot", children: "●" }),
-            /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "context-text", children: "Context Active" })
-          ] })
-        ] })
-      ] }),
-      /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "chat-header-actions", children: [
-        /* @__PURE__ */ jsxRuntimeExports.jsx(
-          "select",
-          {
-            className: "language-selector",
-            value: currentLanguage,
-            onChange: (e) => handleLanguageChange(e.target.value),
-            "aria-label": "Select language",
-            title: "Choose language",
-            children: supportedLanguages.map((lang) => /* @__PURE__ */ jsxRuntimeExports.jsx("option", { value: lang.code, children: lang.nativeName }, lang.code))
-          }
-        ),
-        hasContextMemory && /* @__PURE__ */ jsxRuntimeExports.jsx(
-          "button",
-          {
-            className: "clear-memory-button",
-            onClick: handleClearMemory,
-            "aria-label": "Clear chat memory",
-            title: "Clear chat history",
-            children: /* @__PURE__ */ jsxRuntimeExports.jsxs("svg", { width: "16", height: "16", viewBox: "0 0 24 24", fill: "none", stroke: "currentColor", strokeWidth: "2", children: [
-              /* @__PURE__ */ jsxRuntimeExports.jsx("path", { d: "M3 6h18M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6m3 0V4a2 2 0 012-2h4a2 2 0 012 2v2" }),
-              /* @__PURE__ */ jsxRuntimeExports.jsx("line", { x1: "10", y1: "11", x2: "10", y2: "17" }),
-              /* @__PURE__ */ jsxRuntimeExports.jsx("line", { x1: "14", y1: "11", x2: "14", y2: "17" })
-            ] })
-          }
-        ),
-        /* @__PURE__ */ jsxRuntimeExports.jsx("button", { className: "chat-close-button", onClick: onClose, "aria-label": "Close chat", children: /* @__PURE__ */ jsxRuntimeExports.jsx("svg", { width: "20", height: "20", viewBox: "0 0 24 24", fill: "none", stroke: "currentColor", strokeWidth: "2", children: /* @__PURE__ */ jsxRuntimeExports.jsx("path", { d: "M18 6L6 18M6 6L18 18", strokeLinecap: "round", strokeLinejoin: "round" }) }) })
-      ] })
-    ] }),
-    /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "chat-messages", children: [
-      messages.map((message) => /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: `message ${message.type}`, children: [
-        /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "message-bubble", children: message.content }),
-        /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "message-time", children: formatTime(message.timestamp) })
-      ] }, message.id)),
-      isLoading && /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "message agent", children: /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "message-bubble", children: /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "typing-indicator", children: [
-        /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "typing-dot" }),
-        /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "typing-dot" }),
-        /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "typing-dot" })
-      ] }) }) }),
-      /* @__PURE__ */ jsxRuntimeExports.jsx("div", { ref: messagesEndRef })
-    ] }),
-    voiceError && /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "voice-error", children: [
-      /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "voice-error-text", children: voiceError }),
-      /* @__PURE__ */ jsxRuntimeExports.jsx(
-        "button",
-        {
-          className: "voice-error-close",
-          onClick: () => setVoiceError(null),
-          "aria-label": "Close error",
-          children: "×"
-        }
-      )
-    ] }),
-    /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "chat-input-container", children: [
-      enableVoice && /* @__PURE__ */ jsxRuntimeExports.jsxs(
-        "button",
-        {
-          className: `voice-button ${isRecording ? "recording" : ""} ${!isVoiceSupported ? "disabled" : ""}`,
-          onClick: handleVoiceToggle,
-          disabled: !isVoiceSupported || isLoading,
-          "aria-label": !isVoiceSupported ? "Voice recording not supported" : isRecording ? "Stop voice recording" : "Start voice recording",
-          title: !isVoiceSupported ? "Voice recording is not supported in this browser" : isRecording ? "Click to stop recording" : "Click and speak your message",
-          children: [
-            /* @__PURE__ */ jsxRuntimeExports.jsx("svg", { className: "voice-icon", viewBox: "0 0 24 24", children: isRecording ? (
-              // Recording icon (square)
-              /* @__PURE__ */ jsxRuntimeExports.jsx("rect", { x: "9", y: "9", width: "6", height: "6", fill: "currentColor" })
-            ) : (
-              // Microphone icon
-              /* @__PURE__ */ jsxRuntimeExports.jsxs(jsxRuntimeExports.Fragment, { children: [
-                /* @__PURE__ */ jsxRuntimeExports.jsx("path", { d: "M12 2a4 4 0 0 1 4 4v6a4 4 0 0 1-8 0V6a4 4 0 0 1 4-4z" }),
-                /* @__PURE__ */ jsxRuntimeExports.jsx("path", { d: "M19 10v2a7 7 0 0 1-14 0v-2" }),
-                /* @__PURE__ */ jsxRuntimeExports.jsx("line", { x1: "12", y1: "19", x2: "12", y2: "23" }),
-                /* @__PURE__ */ jsxRuntimeExports.jsx("line", { x1: "8", y1: "23", x2: "16", y2: "23" })
+  return /* @__PURE__ */ jsxRuntimeExports.jsxs(
+    "div",
+    {
+      className: "chat-window opening",
+      style: { "--primary-color": primaryColor },
+      children: [
+        /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "chat-header", children: [
+          /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "chat-header-info", children: [
+            /* @__PURE__ */ jsxRuntimeExports.jsx("img", { src: agentAvatar, alt: agentName, className: "chat-avatar" }),
+            /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "chat-agent-details", children: [
+              /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "chat-agent-name", children: agentName }),
+              hasContextMemory && /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "context-indicator", children: [
+                /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "context-dot", children: "●" }),
+                /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "context-text", children: "Context Active" })
               ] })
-            ) }),
-            isRecording && /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "recording-pulse" })
-          ]
-        }
-      ),
-      /* @__PURE__ */ jsxRuntimeExports.jsx(
-        "input",
-        {
-          ref: inputRef,
-          type: "text",
-          className: "chat-input",
-          placeholder: "Type your message...",
-          value: inputValue,
-          onChange: (e) => setInputValue(e.target.value),
-          onKeyPress: handleKeyPress,
-          disabled: isLoading
-        }
-      ),
-      /* @__PURE__ */ jsxRuntimeExports.jsx(
-        "button",
-        {
-          className: "chat-send-button",
-          onClick: handleSendMessage,
-          disabled: !inputValue.trim() || isLoading,
-          "aria-label": "Send message",
-          children: /* @__PURE__ */ jsxRuntimeExports.jsx("svg", { className: "send-icon", viewBox: "0 0 24 24", children: /* @__PURE__ */ jsxRuntimeExports.jsx("path", { d: "M22 2L11 13M22 2l-7 20-4-9-9-4 20-7z", stroke: "currentColor", strokeWidth: "2", strokeLinecap: "round", strokeLinejoin: "round", fill: "none" }) })
-        }
-      )
-    ] })
-  ] });
+            ] })
+          ] }),
+          /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "chat-header-actions", children: [
+            /* @__PURE__ */ jsxRuntimeExports.jsx(
+              "select",
+              {
+                className: "language-selector",
+                value: currentLanguage,
+                onChange: (e) => handleLanguageChange(e.target.value),
+                "aria-label": "Select language",
+                title: "Choose language",
+                children: supportedLanguages.map((lang) => /* @__PURE__ */ jsxRuntimeExports.jsx("option", { value: lang.code, children: lang.nativeName }, lang.code))
+              }
+            ),
+            hasContextMemory && /* @__PURE__ */ jsxRuntimeExports.jsx(
+              "button",
+              {
+                className: "clear-memory-button",
+                onClick: handleClearMemory,
+                "aria-label": "Clear chat memory",
+                title: "Clear chat history",
+                children: /* @__PURE__ */ jsxRuntimeExports.jsxs(
+                  "svg",
+                  {
+                    width: "16",
+                    height: "16",
+                    viewBox: "0 0 24 24",
+                    fill: "none",
+                    stroke: "currentColor",
+                    strokeWidth: "2",
+                    children: [
+                      /* @__PURE__ */ jsxRuntimeExports.jsx("path", { d: "M3 6h18M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6m3 0V4a2 2 0 012-2h4a2 2 0 012 2v2" }),
+                      /* @__PURE__ */ jsxRuntimeExports.jsx("line", { x1: "10", y1: "11", x2: "10", y2: "17" }),
+                      /* @__PURE__ */ jsxRuntimeExports.jsx("line", { x1: "14", y1: "11", x2: "14", y2: "17" })
+                    ]
+                  }
+                )
+              }
+            ),
+            /* @__PURE__ */ jsxRuntimeExports.jsx(
+              "button",
+              {
+                className: "chat-close-button",
+                onClick: onClose,
+                "aria-label": "Close chat",
+                children: /* @__PURE__ */ jsxRuntimeExports.jsx(
+                  "svg",
+                  {
+                    width: "20",
+                    height: "20",
+                    viewBox: "0 0 24 24",
+                    fill: "none",
+                    stroke: "currentColor",
+                    strokeWidth: "2",
+                    children: /* @__PURE__ */ jsxRuntimeExports.jsx(
+                      "path",
+                      {
+                        d: "M18 6L6 18M6 6L18 18",
+                        strokeLinecap: "round",
+                        strokeLinejoin: "round"
+                      }
+                    )
+                  }
+                )
+              }
+            )
+          ] })
+        ] }),
+        /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "chat-messages", children: [
+          messages.map((message) => /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: `message ${message.type}`, children: [
+            /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "message-bubble", children: message.content }),
+            /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "message-time", children: formatTime(message.timestamp) })
+          ] }, message.id)),
+          isLoading && /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "message agent", children: /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "message-bubble", children: /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "typing-indicator", children: [
+            /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "typing-dot" }),
+            /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "typing-dot" }),
+            /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "typing-dot" })
+          ] }) }) }),
+          /* @__PURE__ */ jsxRuntimeExports.jsx("div", { ref: messagesEndRef })
+        ] }),
+        voiceError && /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "voice-error", children: [
+          /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "voice-error-text", children: voiceError }),
+          /* @__PURE__ */ jsxRuntimeExports.jsx(
+            "button",
+            {
+              className: "voice-error-close",
+              onClick: () => setVoiceError(null),
+              "aria-label": "Close error",
+              children: "×"
+            }
+          )
+        ] }),
+        /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "chat-input-container", children: [
+          enableVoice && /* @__PURE__ */ jsxRuntimeExports.jsxs(
+            "button",
+            {
+              className: `voice-button ${isRecording ? "recording" : ""} ${!isVoiceSupported ? "disabled" : ""}`,
+              onClick: handleVoiceToggle,
+              disabled: !isVoiceSupported || isLoading,
+              "aria-label": !isVoiceSupported ? "Voice recording not supported" : isRecording ? "Stop voice recording" : "Start voice recording",
+              title: !isVoiceSupported ? "Voice recording is not supported in this browser" : isRecording ? "Click to stop recording" : "Click and speak your message",
+              children: [
+                /* @__PURE__ */ jsxRuntimeExports.jsx("svg", { className: "voice-icon", viewBox: "0 0 24 24", children: isRecording ? (
+                  // Recording icon (square)
+                  /* @__PURE__ */ jsxRuntimeExports.jsx("rect", { x: "9", y: "9", width: "6", height: "6", fill: "currentColor" })
+                ) : (
+                  // Microphone icon
+                  /* @__PURE__ */ jsxRuntimeExports.jsxs(jsxRuntimeExports.Fragment, { children: [
+                    /* @__PURE__ */ jsxRuntimeExports.jsx("path", { d: "M12 2a4 4 0 0 1 4 4v6a4 4 0 0 1-8 0V6a4 4 0 0 1 4-4z" }),
+                    /* @__PURE__ */ jsxRuntimeExports.jsx("path", { d: "M19 10v2a7 7 0 0 1-14 0v-2" }),
+                    /* @__PURE__ */ jsxRuntimeExports.jsx("line", { x1: "12", y1: "19", x2: "12", y2: "23" }),
+                    /* @__PURE__ */ jsxRuntimeExports.jsx("line", { x1: "8", y1: "23", x2: "16", y2: "23" })
+                  ] })
+                ) }),
+                isRecording && /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "recording-pulse" })
+              ]
+            }
+          ),
+          /* @__PURE__ */ jsxRuntimeExports.jsx(
+            "input",
+            {
+              ref: inputRef,
+              type: "text",
+              className: "chat-input",
+              placeholder: "Type your message...",
+              value: inputValue,
+              onChange: (e) => setInputValue(e.target.value),
+              onKeyPress: handleKeyPress,
+              disabled: isLoading
+            }
+          ),
+          /* @__PURE__ */ jsxRuntimeExports.jsx(
+            "button",
+            {
+              className: "chat-send-button",
+              onClick: handleSendMessage,
+              disabled: !inputValue.trim() || isLoading,
+              "aria-label": "Send message",
+              children: /* @__PURE__ */ jsxRuntimeExports.jsx("svg", { className: "send-icon", viewBox: "0 0 24 24", children: /* @__PURE__ */ jsxRuntimeExports.jsx(
+                "path",
+                {
+                  d: "M22 2L11 13M22 2l-7 20-4-9-9-4 20-7z",
+                  stroke: "currentColor",
+                  strokeWidth: "2",
+                  strokeLinecap: "round",
+                  strokeLinejoin: "round",
+                  fill: "none"
+                }
+              ) })
+            }
+          )
+        ] })
+      ]
+    }
+  );
 };
 const defaultConfig = {
   position: "bottom-right",
@@ -8860,7 +8880,7 @@ const defaultConfig = {
   },
   agent: {
     name: "HelperBot",
-    avatar: "data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA0MCA0MCIgd2lkdGg9IjQwIiBoZWlnaHQ9IjQwIj4KICA8Y2lyY2xlIGN4PSIyMCIgY3k9IjIwIiByPSIyMCIgZmlsbD0iIzRGNDZFNSIvPgogIDx0ZXh0IHg9IjIwIiB5PSIyNyIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZmlsbD0id2hpdGUiIGZvbnQtZmFtaWx5PSJBcmlhbCwgc2Fucy1zZXJpZiIgZm9udC1zaXplPSIxOCIgZm9udC13ZWlnaHQ9ImJvbGQiPvCfpbY8L3RleHQ+Cjwvc3ZnPg=="
+    avatar: "./avatar.svg"
   },
   enableVoice: true,
   context: "You are a helpful assistant",
@@ -9422,9 +9442,7 @@ class SarvamWidget {
       this.createShadowDOM();
       this.injectStyles();
       this.renderWidget();
-      console.log("Sarvam Widget initialized successfully");
     } catch (error) {
-      console.error("Failed to initialize Sarvam Widget:", error);
     }
   }
   createShadowDOM() {
@@ -9473,7 +9491,6 @@ class SarvamWidget {
 let widgetInstance = null;
 function initWidget() {
   if (widgetInstance) {
-    console.warn("Sarvam Widget is already initialized");
     return widgetInstance;
   }
   widgetInstance = new SarvamWidget();
