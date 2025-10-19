@@ -11,8 +11,7 @@
     "dev": "vite",
     "build": "tsc && vite build",
     "preview": "vite preview",
-    "type-check": "tsc --noEmit",
-    "test-server": "node test-server.js"
+    "type-check": "tsc --noEmit"
   },
   "devDependencies": {
     "@types/react": "^18.2.43",

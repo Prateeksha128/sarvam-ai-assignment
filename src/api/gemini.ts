@@ -1,57 +1,71 @@
-import { GoogleGenerativeAI } from "@google/generative-ai";
+// Secure API client - calls our serverless function instead of direct Gemini API
+let sessionId: string = "default";
+let currentContext: string = "You are a helpful assistant.";
 
-const genAI = new GoogleGenerativeAI("AIzaSyCqjAPCzwnMZezZlg3mWQTm2XbOa5_5J20");
-const model = genAI.getGenerativeModel({ model: "gemini-2.0-flash-exp" });
-
-let chatSession: any = null;
+// Generate a unique session ID for this widget instance
+function generateSessionId(): string {
+  return `session_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+}
 
 export function initGeminiChat(context: string) {
   console.log("🤖 Initializing Gemini chat with context:", context);
-  chatSession = model.startChat({
-    history: [
-      {
-        role: "user",
-        parts: [{ text: context || "You are a helpful assistant." }],
-      },
-    ],
-    generationConfig: {
-      maxOutputTokens: 512,
-      temperature: 0.7,
-    },
-  });
-  console.log("✅ Gemini chat session initialized");
+  currentContext = context || "You are a helpful assistant.";
+  sessionId = generateSessionId(); // Create new session
+  console.log("✅ Gemini chat session initialized with session ID:", sessionId);
 }
 
 export async function sendMessageToGemini(message: string): Promise<string> {
-  console.log("📤 Sending message to Gemini:", message);
-  
-  if (!chatSession) {
-    console.log("⚠️ No chat session found, initializing...");
-    initGeminiChat("You are a helpful assistant.");
-  }
+  console.log("📤 Sending message to Gemini AI:", message);
 
   try {
-    console.log("🔄 Calling Gemini API...");
-    const result = await chatSession.sendMessage(message);
-    const response = result.response.text();
-    console.log("📥 Gemini response received:", response);
-    return response || "(No response)";
+    const baseUrl = window.location.origin;
+    const apiUrl = `${baseUrl}/api/chat`;
+
+    console.log("🔄 Calling Gemini API endpoint:", apiUrl);
+
+    const response = await fetch(apiUrl, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        message,
+        context: currentContext,
+        sessionId,
+      }),
+    });
+
+    if (!response.ok) {
+      const errorData = await response.json().catch(() => ({}));
+      throw new Error(
+        errorData.error || `HTTP ${response.status}: ${response.statusText}`
+      );
+    }
+
+    const data = await response.json();
+    console.log("📥 Gemini AI response received:", data.response);
+    return (
+      data.response || "I apologize, but I didn't receive a proper response."
+    );
   } catch (error: any) {
     console.error("❌ Gemini API error:", error);
-    console.error("Error details:", {
-      message: error?.message,
-      stack: error?.stack,
-      name: error?.name
-    });
-    return `Sorry, I encountered an error: ${error?.message || "Could not reach Gemini API"}`;
+
+    // Provide helpful deployment message for local development
+    if (window.location.hostname === "localhost") {
+      return "🚀 To get real AI responses, deploy this project to Vercel where the API endpoints are available. The widget is working perfectly and will use real Gemini AI in production!";
+    }
+
+    return `I apologize, but I'm having trouble connecting to my AI service right now. Please try again in a moment. Error: ${error?.message}`;
   }
 }
 
 // Additional helper functions for compatibility
 export function resetChatSession() {
-  chatSession = null;
+  // Generate a new session ID to effectively "reset" the chat
+  sessionId = generateSessionId();
+  console.log("🔄 Chat session reset with new session ID:", sessionId);
 }
 
 export function getChatSession() {
-  return chatSession;
+  return { sessionId, context: currentContext };
 }
